@@ -3,39 +3,46 @@ import TodoListTemplate from "../components/TodoListTemplate";
 import Form from "../components/Form";
 import TodoItemList from "../components/TodoItemList";
 import Pallet from "../components/Pallet";
+import {Map, List} from 'immutable'
 
 class Todo extends Component {
   id = 3
   state = {
-    // 할일 목록
-    input: '',
-    todos: [
-      {id: 0, text: 'hi', checked: false, color: '#343a40'},
-      {id: 1, text: 'hi', checked: true, color: '#343a40'},
-      {id: 2, text: 'hi', checked: false, color: '#343a40'},
-    ],
-    colors: [
-      '#343a40', '#f03e3e', '#12b886', '#228ae6'
-    ],
-    color: '',
+    data: Map({
+      // 할일 목록
+      input: '',
+      todos: List([
+        Map({id: 0, text: 'hi', checked: false, color: '#343a40'}),
+        Map({id: 1, text: 'hi', checked: true, color: '#343a40'}),
+        Map({id: 2, text: 'hi', checked: false, color: '#343a40'}),
+      ]),
+      colors: List([
+        '#343a40', '#f03e3e', '#12b886', '#228ae6'
+      ]),
+      color: '',
+    })
   }
 
   todoChange = (e) => {
+    const {value} = e.target
+    const {data} = this.state
+
     this.setState({
-      input: e.target.value
+      data: data.set('input', value)
     })
   }
 
   todoCreate = () => {
-    const {input, todos, color} = this.state
+    const {data} = this.state
+
     this.setState({
-      input: '',
-      todos: todos.concat({
-        id: this.id++,
-        text: input,
-        checked: false,
-        color: color,
-      })
+      data: data.set('input', '')
+        .update('todos', todos => todos.concat({
+          id: this.id++,
+          text: data.get('input'),
+          checked: false,
+          color: data.get('color')
+        }))
     })
   }
 
@@ -46,12 +53,12 @@ class Todo extends Component {
   }
 
   todoToggle = (id) => {
-    const {todos} = this.state
+    const {data} = this.state
 
-    const index = todos.findIndex(todo => todo.id === id)
-    const selected = todos[index]
+    const index = data.get('todos').findIndex(todo => todo.id === id)
+    const selected = data.get('todos')[index]
 
-    const nextTodos = [...todos]
+    const nextTodos = [...data.get('todos')]
 
     nextTodos[index] = {
       ...selected,
@@ -59,27 +66,35 @@ class Todo extends Component {
     }
 
     this.setState({
-      todos: nextTodos
+      data: data.set('todos', nextTodos)
     })
   }
 
   todoRemove = (id) => {
-    const {todos} = this.state
+    const {data} = this.state
+
     this.setState({
-      todos: todos.filter(todo => todo.id !== id)
+      data: data.update('todos', todos => todos.filter(todo => todo.id !== id))
     })
   }
 
   colorChange = (value) => {
+    const {data} = this.state
+
     this.setState({
-      color: value
+      data: data.set('color', value)
     })
   }
 
   render() {
     // 할일목록
-    const {input, todos, colors, color} = this.state
     const {todoChange, todoCreate, todoKeyPress, todoToggle, todoRemove, colorChange} = this
+    const {data} = this.state
+    const input = data.get('input')
+    const todos = data.get('todos')
+    const colors = data.get('colors')
+    const color = data.get('color')
+
     return (
       <TodoListTemplate pallet={<Pallet colors={colors} colorChange={colorChange}/>}
                         form={
@@ -95,4 +110,5 @@ class Todo extends Component {
     )
   }
 }
- export default Todo
+
+export default Todo
