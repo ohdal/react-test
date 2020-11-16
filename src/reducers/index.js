@@ -1,28 +1,72 @@
-import number from "./number";
-import color from "./color";
+import * as types from '../actions/ActionTypes'
 
-import {combineReducers}from "redux";
-
-/*
-    서브 리듀서들을 하나로 합칩니다.
-    combineReducers 를 실행하고 나면, 나중에 store의 형태가 파라미터로 전달한 객체의 모양대로 만들어집니다.
-    지금의 경우:
+// 초기 상태 정의
+const initialState = {
+  counters: [
     {
-        numberData: {
-            number: 0
-        },
-        colorData: {
-            color: 'black'
-        }
+      color: 'black',
+      number: 0,
     }
-    로 만들어집니다.
-*/
+  ]
+}
 
+// 리듀서 함수 정의
+function counter(state = initialState, action) {
+  // 레퍼런스 생성
+  const {counters} = state
 
+  switch (action.type) {
+    case types.CREATE:
+      return {
+        counters: [
+          ...counters,
+          {
+            color: action.color,
+            number: 0,
+          }
+        ]
+      }
+    case types.REMOVE:
+      return {
+        // 맨마지막 카운터 삭제시키기
+        counters: counters.slice(0, counters.length - 1)
+      }
+    case types.INCREMENT:
+      return {
+        counters: [
+          ...counters.slice(0, action.index),
+          {
+            ...counters[action.index],
+            number: counters[action.index].number + 1
+          },
+          ...counters.slice(action.index + 1, counters.length)
+        ]
+      }
+    case types.DECREMENT:
+      return {
+        counters: [
+          ...counters.slice(0, action.index),
+          {
+            ...counters[action.index],
+            number: counters[action.index].number - 1
+          },
+          ...counters.slice(action.index + 1, counters.length)
+        ]
+      }
+    case types.SET_COLOR:
+      return {
+        counters: [
+          ...counters.slice(0, action.index),
+          {
+            ...counters[action.index],
+            color: action.color
+          },
+          ...counters.slice(action.index + 1, counters.length)
+        ]
+      }
+    default:
+      return state
+  }
+}
 
-const reducers = combineReducers({
-  numberData: number,
-  colorData: color
-});
-
-export default reducers;
+export default counter
