@@ -55,8 +55,8 @@ class Todo extends Component {
   todoToggle = (id) => {
     const {data} = this.state
 
-    const index = data.get('todos').findIndex(todo => todo.id === id)
-    const selected = data.get('todos')[index]
+    const index = data.get('todos').findIndex(todo => todo.get('id') === id)
+    const selected = data.get('todos').get(index)
 
     const nextTodos = [...data.get('todos')]
 

@@ -4,6 +4,7 @@ import './TodoItem.scss'
 class TodoItem extends Component {
   render() {
     const {color, text, checked, id, onToggle, onRemove} = this.props
+    console.log(color, text, checked, id)
 
     return (
       // onClick={onToggle(id)} X
